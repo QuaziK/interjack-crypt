@@ -1,4 +1,5 @@
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -13,6 +14,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -34,9 +36,8 @@ public class Main extends JFrame implements ActionListener {
 		pane = new JPanel();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height
-				/ 2 - this.getSize().height / 2);
-		enc = new JRadioButton("encrypt");
+		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
+		enc = new JRadioButton("encrypt", true);
 		dec = new JRadioButton("decrypt");
 		enter = new JButton("enter");
 		browse = new JButton("browse");
@@ -44,7 +45,7 @@ public class Main extends JFrame implements ActionListener {
 		browse.addActionListener(this);
 		chara = new JTextField("key", 3);
 		input = new JTextField("input", 20);
-		output = new JTextField("out", 20);
+		output = new JTextField("", 20);
 		fc = new JFileChooser();
 		ButtonGroup group = new ButtonGroup();
 		group.add(enc);
@@ -67,37 +68,44 @@ public class Main extends JFrame implements ActionListener {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
 				file = file.getAbsoluteFile();
-				try {
-					BufferedReader literate = new BufferedReader(new FileReader(file));
-					StringBuilder sb = new StringBuilder();
-					String line = literate.readLine();
-					while (line != null) {
-						sb.append(line);
-						sb.append(System.lineSeparator());
-						line = literate.readLine();
+				if (file.length() != 0){
+					try {
+						BufferedReader literate = new BufferedReader(new FileReader(file));
+						StringBuilder sb = new StringBuilder();
+						String line = literate.readLine();
+						while (line != null) {
+							sb.append(line);
+							sb.append(System.lineSeparator());
+							line = literate.readLine();
+						}
+						fileVal = sb.toString();
+						PrintWriter author = new PrintWriter(file.getParent() + "\\" + file.getName() + ".inj", "UTF-8");
+						if (enc.isSelected()) {
+							// encrypt everything in the file to a file with .inj extension
+							output.setText("Processing " + file.getName());
+							jack.changeKey(chara.getText().charAt(0));
+							fileVal = jack.encrypt(fileVal);
+							author.write(fileVal);
+							output.setText(file.getName() + ".inj");
+							StringSelection stringSelection = new StringSelection(fileVal);
+							Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+							clpbrd.setContents(stringSelection, null);
+						} else if (dec.isSelected()) {
+							//TODO DECRYPT TO FILE
+							// decrypt everything to the file with original extension
+							jack.changeKey(chara.getText().charAt(0));
+							fileVal = jack.decrypt(fileVal);
+							output.setText(fileVal);
+							StringSelection stringSelection = new StringSelection(text);
+							Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+							clpbrd.setContents(stringSelection, null);
+						}
+						author.close();
+						literate.close();
+					} catch (Exception E) {
+						E.printStackTrace(System.err);
+						JOptionPane.showMessageDialog(null, "404 file not found");
 					}
-					fileVal = sb.toString();
-					//TODO MAKE OUTPUT INTO A FILE AT SAME LOCATION
-					if (enc.isSelected()) {
-						// encrypt everything in the file
-						jack.changeKey(chara.getText().charAt(0));
-						fileVal = jack.encrypt(fileVal);
-						output.setText(fileVal);
-						StringSelection stringSelection = new StringSelection(fileVal);
-						Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-						clpbrd.setContents(stringSelection, null);
-					} else if (dec.isSelected()) {
-						// decrypt everything in the file
-						jack.changeKey(chara.getText().charAt(0));
-						fileVal = jack.decrypt(fileVal);
-						output.setText(fileVal);
-						StringSelection stringSelection = new StringSelection(text);
-						Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-						clpbrd.setContents(stringSelection, null);
-					}
-					literate.close();
-				} catch (Exception E) {
-					System.out.println("Nope doesnt work");
 				}
 			}
 		} else if (e.getSource() == enter){
