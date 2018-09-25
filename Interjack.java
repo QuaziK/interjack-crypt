@@ -1,4 +1,4 @@
-//Yegor "QzK" Kozhevnikov
+//QuaziK
 public class Interjack {
 	
 	private char key;
