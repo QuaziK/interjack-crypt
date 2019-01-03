@@ -1,3 +1,4 @@
+﻿import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -17,6 +18,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+
+//Yegor "QuaziK" Kozhevnikov
 
 public class Main extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1;
