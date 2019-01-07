@@ -1,4 +1,4 @@
-//QuaziK
+//author: Yegor "QuaziK" Kozhevnikov
 public class Interjack {
 	
 	private char key;
