@@ -1,5 +1,4 @@
-﻿import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -19,11 +18,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-//Yegor "QuaziK" Kozhevnikov
-
 public class Main extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1;
-	Interjack jack = new Interjack('Ü');
+	Interjack jack = new Interjack('U');
 	JButton enter, browse;
 	JTextField chara, input, output;
 	JRadioButton enc, dec;
@@ -38,7 +35,8 @@ public class Main extends JFrame implements ActionListener {
 		pane = new JPanel();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
+		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height
+				/ 2 - this.getSize().height / 2);
 		enc = new JRadioButton("encrypt", true);
 		dec = new JRadioButton("decrypt");
 		enter = new JButton("enter");
@@ -70,9 +68,10 @@ public class Main extends JFrame implements ActionListener {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
 				file = file.getAbsoluteFile();
-				if (file.length() != 0){
+				if (file.length() != 0) {
 					try {
-						BufferedReader literate = new BufferedReader(new FileReader(file));
+						BufferedReader literate = new BufferedReader(
+								new FileReader(file));
 						StringBuilder sb = new StringBuilder();
 						String line = literate.readLine();
 						while (line != null) {
@@ -80,44 +79,47 @@ public class Main extends JFrame implements ActionListener {
 							sb.append(System.lineSeparator());
 							line = literate.readLine();
 						}
-						fileVal = sb.toString();
-						PrintWriter author = new PrintWriter(file.getParent() + "\\" + file.getName() + ".inj", "UTF-8");
+						fileVal = sb.toString().replace("\n", "").trim();
+						PrintWriter author;
 						if (enc.isSelected()) {
-							// encrypt everything in the file to a file with .inj extension
+							// encrypt everything in the file to a file with
+							// .inj extension
+							author  = new PrintWriter(file.getParent() + "\\" + file.getName() +".inj", "UTF-8");
 							output.setText("Processing " + file.getName());
 							jack.changeKey(chara.getText().charAt(0));
 							fileVal = jack.encrypt(fileVal);
-							author.write(fileVal);
-							output.setText(file.getName() + ".inj");
-							StringSelection stringSelection = new StringSelection(fileVal);
-							Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-							clpbrd.setContents(stringSelection, null);
+							author.println(fileVal);
+							output.setText(file.getPath() + ".inj");
+							author.close();
 						} else if (dec.isSelected()) {
-							//TODO DECRYPT TO FILE
-							// decrypt everything to the file with original extension
+							// decrypt everything to the file with original
+							// extension
+							String[] finalPath = file.getPath().split(".inj");
+							author = new PrintWriter(finalPath[0], "UTF-8");
+							output.setText("Processing " + file.getName());
 							jack.changeKey(chara.getText().charAt(0));
 							fileVal = jack.decrypt(fileVal);
-							output.setText(fileVal);
-							StringSelection stringSelection = new StringSelection(text);
-							Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-							clpbrd.setContents(stringSelection, null);
+							author.println(fileVal);
+							output.setText(finalPath[0]);
+							author.close();
 						}
-						author.close();
 						literate.close();
 					} catch (Exception E) {
 						E.printStackTrace(System.err);
-						JOptionPane.showMessageDialog(null, "404 file not found");
+//						JOptionPane.showMessageDialog(null,
+//								"404 file not found");
 					}
 				}
 			}
-		} else if (e.getSource() == enter){
+		} else if (e.getSource() == enter) {
 			if (enc.isSelected()) {
 				// encrypt everything in the line
 				jack.changeKey(chara.getText().charAt(0));
 				text = jack.encrypt(input.getText());
 				output.setText(text);
 				StringSelection stringSelection = new StringSelection(text);
-				Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+				Clipboard clpbrd = Toolkit.getDefaultToolkit()
+						.getSystemClipboard();
 				clpbrd.setContents(stringSelection, null);
 			} else if (dec.isSelected()) {
 				// decrypt everything in the line
@@ -125,7 +127,8 @@ public class Main extends JFrame implements ActionListener {
 				text = jack.decrypt(input.getText());
 				output.setText(text);
 				StringSelection stringSelection = new StringSelection(text);
-				Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+				Clipboard clpbrd = Toolkit.getDefaultToolkit()
+						.getSystemClipboard();
 				clpbrd.setContents(stringSelection, null);
 			}
 		}
@@ -134,5 +137,4 @@ public class Main extends JFrame implements ActionListener {
 	public static void main(String args[]) {
 		Main coo = new Main();
 	}
-
 }
