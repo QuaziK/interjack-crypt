@@ -8,15 +8,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Main extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1;
@@ -46,7 +47,9 @@ public class Main extends JFrame implements ActionListener {
 		chara = new JTextField("key", 3);
 		input = new JTextField("input", 20);
 		output = new JTextField("", 20);
+		output.setEditable(false);
 		fc = new JFileChooser();
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("Interjack Documents", "inj"));
 		ButtonGroup group = new ButtonGroup();
 		group.add(enc);
 		group.add(dec);
@@ -72,23 +75,28 @@ public class Main extends JFrame implements ActionListener {
 					try {
 						BufferedReader literate = new BufferedReader(
 								new FileReader(file));
-						StringBuilder sb = new StringBuilder();
+						ArrayList<String> sb = new ArrayList<String>();
 						String line = literate.readLine();
 						while (line != null) {
-							sb.append(line);
-							sb.append(System.lineSeparator());
+							sb.add(line);
+							//sb.append(System.lineSeparator());
 							line = literate.readLine();
 						}
-						fileVal = sb.toString().replace("\n", "").trim();
+						fileVal = fileVal.trim();
+						System.out.println(fileVal);
 						PrintWriter author;
 						if (enc.isSelected()) {
 							// encrypt everything in the file to a file with
 							// .inj extension
-							author  = new PrintWriter(file.getParent() + "\\" + file.getName() +".inj", "UTF-8");
+							author = new PrintWriter(file.getParent() + "\\"
+									+ file.getName() + ".inj", "UTF-8");
 							output.setText("Processing " + file.getName());
 							jack.changeKey(chara.getText().charAt(0));
-							fileVal = jack.encrypt(fileVal);
-							author.println(fileVal);
+							for (String sting: sb){
+								author.println(jack.encrypt(sting));
+							}
+//							fileVal = jack.encrypt(fileVal);
+//							author.println(fileVal);
 							output.setText(file.getPath() + ".inj");
 							author.close();
 						} else if (dec.isSelected()) {
@@ -98,16 +106,19 @@ public class Main extends JFrame implements ActionListener {
 							author = new PrintWriter(finalPath[0], "UTF-8");
 							output.setText("Processing " + file.getName());
 							jack.changeKey(chara.getText().charAt(0));
-							fileVal = jack.decrypt(fileVal);
-							author.println(fileVal);
+							for (String sting: sb){
+								author.println(jack.decrypt(sting));
+							}
+//							fileVal = jack.decrypt(fileVal);
+//							author.println(fileVal);
 							output.setText(finalPath[0]);
 							author.close();
 						}
 						literate.close();
 					} catch (Exception E) {
 						E.printStackTrace(System.err);
-//						JOptionPane.showMessageDialog(null,
-//								"404 file not found");
+						// JOptionPane.showMessageDialog(null,
+						// "404 file not found");
 					}
 				}
 			}
