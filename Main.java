@@ -4,6 +4,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -32,12 +34,11 @@ public class Main extends JFrame implements ActionListener {
 
 	public Main() {
 		super("Interjack Crypt");
-		setSize(315, 150);
+		setSize(315, 160);
 		pane = new JPanel();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height
-				/ 2 - this.getSize().height / 2);
+		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
 		enc = new JRadioButton("encrypt", true);
 		dec = new JRadioButton("decrypt");
 		enter = new JButton("enter");
@@ -46,6 +47,29 @@ public class Main extends JFrame implements ActionListener {
 		browse.addActionListener(this);
 		chara = new JTextField("key", 3);
 		input = new JTextField("input", 20);
+        input.addFocusListener(new FocusListener() {
+            public void focusGained(FocusEvent e) {
+                input.setText("");
+            }
+
+            public void focusLost(FocusEvent e) {
+                if (input.getText().equals("")) {
+                    input.setText("input");
+                }
+            }
+        });    
+        chara.addFocusListener(new FocusListener() {
+            public void focusGained(FocusEvent e) {
+                chara.setText("");
+            }
+
+            public void focusLost(FocusEvent e) {
+                if (chara.getText().equals("")) {
+                    chara.setText("key");
+                }
+            }
+        });    
+        enc.requestFocus();        
 		output = new JTextField("", 20);
 		output.setEditable(false);
 		fc = new JFileChooser();
