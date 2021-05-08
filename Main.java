@@ -34,7 +34,6 @@ public class Main extends JFrame implements ActionListener {
 
 	public Main() {
 		super("Interjack Crypt");
-		setSize(315, 160);
 		pane = new JPanel();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -49,7 +48,9 @@ public class Main extends JFrame implements ActionListener {
 		input = new JTextField("input", 20);
         input.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
-                input.setText("");
+                if (input.getText().equals("input")){
+                    input.setText("");
+                }
             }
 
             public void focusLost(FocusEvent e) {
@@ -60,7 +61,9 @@ public class Main extends JFrame implements ActionListener {
         });    
         chara.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
-                chara.setText("");
+                if (chara.getText().equals("key")){
+                    chara.setText("");
+                }
             }
 
             public void focusLost(FocusEvent e) {
@@ -68,8 +71,7 @@ public class Main extends JFrame implements ActionListener {
                     chara.setText("key");
                 }
             }
-        });    
-        enc.requestFocus();        
+        });           
 		output = new JTextField("", 20);
 		output.setEditable(false);
 		fc = new JFileChooser();
@@ -85,6 +87,9 @@ public class Main extends JFrame implements ActionListener {
 		pane.add(output);
 		pane.add(browse);
 		add(pane);
+        pack();
+        setSize(315, 160);
+        browse.requestFocusInWindow(); 
 
 		setVisible(true);
 	}
